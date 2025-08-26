@@ -1,0 +1,59 @@
+---
+title: "Analyze the Popularity of Programming Languages"
+format: html
+---
+
+```{r}
+# Load package
+library(tidyverse) # For data manipulation and visualization
+library(skimr)
+
+# Load dataset
+stack_overflow_data <- read_csv("Data/stack_overflow_data.csv")
+
+glimpse(stack_overflow_data) # Check data type
+skim(stack_overflow_data) # Summary statistics
+
+```
+
+#### What percentage of the total number of questions asked in 2020 had the R tag?
+
+```{r}
+# Filter for year 2020 & 'r' tag
+r_2020 <- stack_overflow_data |>
+  filter(year == 2020 & tag == "r") |>
+  mutate(percentage = num_questions / year_total * 100) # Calculate percentage
+
+r_2020 # View result
+
+```
+
+```{r}
+# Plot percentage of R-tagged questions over time
+stack_overflow_data |>
+  filter(tag == "r") |>
+  mutate(percentage = num_questions / year_total * 100) |>
+  ggplot(aes(x = year, y = percentage)) +
+  geom_line(color = "#2c3e50", linewidth = 1) +
+  labs(
+    title = "Popularity of R Tag Over Time",
+    x = "Year",
+    y = "Percentage of Questions"
+  ) +
+  theme_minimal()
+
+```
+
+#### What were the five most asked-about tags between 2015-2020?
+
+```{r}
+# Filter between 2015 and 2020 (inclusive)
+highest_tags <- stack_overflow_data |>
+  filter(year >= 2015 & year <= 2020) |>
+  group_by(tag) |>
+  summarize(total_questions = sum(num_questions)) |> # Summarize total questions per tag
+  arrange(desc(total_questions)) |> # Sort
+  head(5) # Top 5
+
+highest_tags # View result
+```
