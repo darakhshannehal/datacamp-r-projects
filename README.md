@@ -16,4 +16,3 @@ datacamp-r-projects/
                   
 ```
 
-## Project Summary
