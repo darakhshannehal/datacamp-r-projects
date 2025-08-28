@@ -17,3 +17,9 @@ datacamp-r-projects/
 ```
 
 ## Project Summary
+
+| Title | Libraries Used | Key Functions & Methods |
+|--------------------------|---------------------|--------------------------|
+| Analyze the Popularity of Programming Languages | `tidyverse`, `skimr`, `ggplot2` | `read_csv()`, `filter()`, `mutate()`, `group_by()`, `summarize()`, `arrange()`, `slice_head()`, `ggplot()`, `geom_line()`, `skim()`, `glimpse()` |
+|  |  |  |
+| .... |  |  |
