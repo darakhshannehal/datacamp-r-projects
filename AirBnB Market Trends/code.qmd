@@ -1,0 +1,87 @@
+---
+title: "AirBnB Market Trend"
+format: html
+---
+As a consultant working for a real estate start-up, you have collected Airbnb listing data from various sources to investigate the short-term rental market in New York. You'll analyze this data to provide insights on private rooms to the real estate company.
+```{r}
+# Load packages
+library(tidyverse)
+library(readxl) #  For reading Excel files (.xlsx or .xls)
+```
+
+```{r}
+# Load datasets
+# Load CSV file for prices
+airbnb_price <- read_csv('data/airbnb_price.csv', show_col_types = FALSE)
+
+# Load Excel file for room types
+airbnb_room_type <- readxl::read_xlsx('data/airbnb_room_type.xlsx')
+
+# Load TSV file for review dates
+airbnb_last_review <- read_tsv(
+  'data/airbnb_last_review.tsv',
+  show_col_types = FALSE
+)
+```
+
+What are the dates of the earliest and most recent reviews?
+```{r}
+# Check data type
+glimpse(airbnb_last_review)
+
+# Convert the 'last_review' character column into date object
+airbnb_last_review = airbnb_last_review %>%
+  mutate(last_review_date = parse_date_time(last_review, orders = "B d Y"))
+
+first_reviewed <- min(airbnb_last_review$last_review_date, na.rm = TRUE)
+last_reviewed <- max(airbnb_last_review$last_review_date, na.rm = TRUE)
+```
+
+How many of the listings are private rooms?
+```{r}
+head(airbnb_room_type)
+unique(airbnb_room_type$room_type)
+
+# Normalize and List Unique Room Types
+airbnb_room_type = airbnb_room_type %>%
+  mutate(room_type_clean = str_to_title(str_trim(room_type)))
+
+airbnb_room_type %>%
+  distinct(room_type_clean)
+
+# Total Private room listings
+nb_private_rooms = airbnb_room_type %>%
+  filter(room_type_clean == "Private Room") %>%
+  summarise(nb_private_rooms = n()) |>
+  pull()
+```
+
+What is the average listing price for all rooms (rounded to the nearest penny)?
+```{r}
+head(airbnb_price)
+glimpse(airbnb_price)
+
+airbnb_price_clean <- airbnb_price %>%
+  mutate(
+    price_in_dollars = str_extract(price, "\\d+") %>%
+      as.numeric()
+  )
+
+# Average listing price for all rooms
+avg_price = airbnb_price_clean %>%
+  summarise(avg_price = round(mean(price_in_dollars), 2)) |>
+  pull()
+```
+
+```{r}
+## Combine these four values into one tibble called review_dates with four columns: first_reviewed, last_reviewed, nb_private_rooms, and avg_price. The tibble should only contain one row of values.
+
+review_dates <- tibble(
+  first_reviewed,
+  last_reviewed,
+  nb_private_rooms,
+  avg_price
+)
+
+review_dates
+```
