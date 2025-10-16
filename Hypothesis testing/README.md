@@ -8,6 +8,5 @@ Using Official FIFA World Cup matches after 2002-01-01, assuming each match is f
 
 -   You assume a 10% significance level, and use the following null and alternative hypotheses:
 
-Ho : The mean number of goals scored in women's international soccer matches is the same as men's.
-
-HA : The mean number of goals scored in women's international soccer matches is greater than men's.
+H₀: Mean goals in women’s matches = Mean goals in men’s matches
+H₁: Mean goals in women’s matches > Mean goals in men’s matches
