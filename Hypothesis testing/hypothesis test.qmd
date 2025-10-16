@@ -1,0 +1,84 @@
+---
+title: "Hypothesis testing"
+format: html
+---
+
+Perform an appropriate hypothesis test to determine the p-value, and decide whether to reject the null hypothesis that the mean number of goals scored in women's international soccer matches is the same as men's. Use a 10% significance level.
+
+Store the p-value and the test result in a data frame called result_df, withp_val as the p-value and result as either the string "fail to reject" or "reject", based on the test outcome.
+
+```{r}
+# Import libraries
+library(tidyverse)
+library(patchwork)
+
+```
+
+```{r}
+# Load Datasets
+men_results = read_csv("Data/men_results.csv")
+women_results = read_csv("Data/women_results.csv")
+```
+
+### Filter datasets
+```{r}
+# Filter for FIFA World Cup match data for both men’s and women’s tournaments to include only matches after 2002-01-01.
+
+glimpse(men_results) # Check data type
+glimpse(women_results)
+
+men = men_results |>
+  filter(tournament == "FIFA World Cup" & date > "2002-01-01") |>
+  mutate(total_goals = home_score + away_score)
+
+women = women_results |>
+  filter(tournament == "FIFA World Cup" & date > "2002-01-01") |>
+  mutate(total_goals = home_score + away_score)
+
+```
+
+### Check for normality
+```{r}
+men_plot <- ggplot(men, aes(x = total_goals)) +
+  geom_histogram(fill = "tan3", bins = 30) +
+  ggtitle("Goals Scored (Men's)") +
+  xlab("Goals Scored") +
+  ylab("Frequency")
+
+women_plot <- ggplot(women, aes(x = total_goals)) +
+  geom_histogram(fill = "steelblue2", bins = 30) +
+  ggtitle("Goals Scored (Women's)") +
+  xlab("Goals Scored") +
+  ylab("Frequency")
+
+combined_plot <- men_plot + women_plot
+combined_plot
+```
+
+###  Run  t-test 
+```{r}
+
+wilcox.test(
+  x = women$total_goals,
+  y = men$total_goals,
+  alternative = "greater"
+)
+```
+
+```{r}
+# Run the test and store result
+test_result <- wilcox.test(
+  x = women$total_goals,
+  y = men$total_goals,
+  alternative = "greater"
+)
+
+# Extract p-value and decision
+p_val <- round(test_result$p.value, 4)
+result <- ifelse(p_val <= 0.10, "reject", "fail to reject")
+
+# Create result data frame
+result_df <- data.frame(p_val = p_val, result = result)
+result_df
+```
+
