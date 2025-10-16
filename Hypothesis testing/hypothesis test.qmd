@@ -7,10 +7,15 @@ Perform an appropriate hypothesis test to determine the p-value, and decide whet
 
 Store the p-value and the test result in a data frame called result_df, withp_val as the p-value and result as either the string "fail to reject" or "reject", based on the test outcome.
 
+# Hypotheses:
+# H0: The distribution of goals is the same for women's and men's matches.
+# HA: Goals in women's matches are stochastically greater than men's.
+# Significance Level (alpha): 0.10
+
 ```{r}
 # Import libraries
 library(tidyverse)
-library(patchwork)
+library(patchwork)  # For combining plots
 
 ```
 
@@ -24,12 +29,12 @@ women_results = read_csv("Data/women_results.csv")
 ```{r}
 # Filter for FIFA World Cup match data for both men’s and women’s tournaments to include only matches after 2002-01-01.
 
-glimpse(men_results) # Check data type
+glimpse(men_results) # Check data types
 glimpse(women_results)
 
 men = men_results |>
   filter(tournament == "FIFA World Cup" & date > "2002-01-01") |>
-  mutate(total_goals = home_score + away_score)
+  mutate(total_goals = home_score + away_score)  # # Calculate total goals per match
 
 women = women_results |>
   filter(tournament == "FIFA World Cup" & date > "2002-01-01") |>
@@ -37,39 +42,56 @@ women = women_results |>
 
 ```
 
-### Check for normality
+### Check for distribution
 ```{r}
+# Plotting histograms to check the distribution (checking for normality).
 men_plot <- ggplot(men, aes(x = total_goals)) +
-  geom_histogram(fill = "tan3", bins = 30) +
-  ggtitle("Goals Scored (Men's)") +
-  xlab("Goals Scored") +
+  geom_histogram(fill = "tan3", bins = 15, color = "black") + 
+  ggtitle("Goals Scored (Men's World Cup Matches)") +
+  xlab("Total Goals Scored") +
   ylab("Frequency")
 
 women_plot <- ggplot(women, aes(x = total_goals)) +
-  geom_histogram(fill = "steelblue2", bins = 30) +
-  ggtitle("Goals Scored (Women's)") +
-  xlab("Goals Scored") +
+  geom_histogram(fill = "steelblue2", bins = 15, color = "black") + 
+  ggtitle("Goals Scored (Women's World Cup Matches)") +
+  xlab("Total Goals Scored") +
   ylab("Frequency")
 
 combined_plot <- men_plot + women_plot
 combined_plot
+
+# Goal count data is right-skewed, suggesting a non-parametric test 
 ```
 
-###  Run  t-test 
+###  Run Wilcoxon Rank Sum Test
 ```{r}
+# Non-parametric Wilcoxon Rank Sum Test (Mann-Whitney U) is used, as the distribution is non-normal (as confirmed by the histograms), 
 
-wilcox.test(
+# The 'wilcox.test' tests the median/distribution, which is an appropriate non-parametric 
+# equivalent for the mean comparison when the data is not normal.
+# alternative = "greater" tests if goals in women's (x) are greater than men's (y).
+
+test_result <- wilcox.test( 
   x = women$total_goals,
   y = men$total_goals,
   alternative = "greater"
 )
+
+# Print the test output 
+print(test_result)
 ```
 
 ```{r}
 # Store result
-# Extract p-value and decision
+# Set significance level
+alpha = 0.10
+
+# Extract p-value 
+# Round to 4 decimal places
 p_val <- round(test_result$p.value, 4)
-result <- ifelse(p_val <= 0.10, "reject", "fail to reject")
+
+# Determine the decision based on the p-value and the alpha (0.10)
+result <- ifelse(p_val <= alpha, "reject", "fail to reject")
 
 # Create result data frame
 result_df <- data.frame(p_val = p_val, result = result)
