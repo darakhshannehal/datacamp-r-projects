@@ -66,13 +66,7 @@ wilcox.test(
 ```
 
 ```{r}
-# Run the test and store result
-test_result <- wilcox.test(
-  x = women$total_goals,
-  y = men$total_goals,
-  alternative = "greater"
-)
-
+# Store result
 # Extract p-value and decision
 p_val <- round(test_result$p.value, 4)
 result <- ifelse(p_val <= 0.10, "reject", "fail to reject")
