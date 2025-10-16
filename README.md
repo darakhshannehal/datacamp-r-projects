@@ -19,7 +19,7 @@ datacamp-r-projects/
 ## Project Summary
 
 | Title | Libraries Used |
-|-------------------------------------|---------------------|
+|---------------------------------------------|--------------------------|
 | Analyze the Popularity of Programming Languages | `tidyverse`, `skimr`, `ggplot2` |
 | Exploring AirBnB Market Trends | `tidyverse`, `readxl`, `skimr` |
 | .... |  |
